@@ -297,8 +297,12 @@ const util = {
 
   isInDocker() {
     try {
-      fs.statSync('/.dockerenv');
-      return true;
+      // 方法一：检查 /.dockerenv 文件
+      if (fs.existsSync('/.dockerenv')) return true;
+
+      // 方法二：检查 /proc/1/cgroup 内容
+      const cgroup = fs.readFileSync('/proc/1/cgroup', 'utf8');
+      return /docker|containerd|kubepods/.test(cgroup);
     } catch (err) {
       return false;
     }
